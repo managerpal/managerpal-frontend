@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {Component} from 'react';
+import {Text, StyleSheet, View, SafeAreaView} from 'react-native';
 
-export default function App() {
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { Link } from '@react-navigation/native';
+
+import LoginScreen from "./components/login";
+import HomeScreen from "./components/home";
+import RegisterScreen from "./components/register";
+
+const Stack = createNativeStackNavigator();
+function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen component={LoginScreen} name={"LoginScreen"}/>
+          <Stack.Screen component = {HomeScreen} name={"HomeScreen"}/>
+          <Stack.Screen component = {RegisterScreen} name={"RegisterScreen"}/>
+        </Stack.Navigator>
+      </NavigationContainer>
+  )
 }
 
 const styles = StyleSheet.create({
+  baseText: {
+    fontFamily: 'Cochin',
+  },
+  titleText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    alignItems: "center",
+    justifyContent: "center",
+  }
 });
+
+export default App
