@@ -29,7 +29,7 @@ function RegisterScreen({ navigation }) {
         };
 
         try {
-            const response = await fetch('http://localhost/auth/signup', register);
+            const response = await fetch('https://managerpal.seewhyjay.dev/auth/signup', register);
             const data = await response.json();
             if (response.status === 400) {
                 throw new Error(data.error);

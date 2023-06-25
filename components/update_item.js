@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {Text, View, StyleSheet, Button, Alert, SafeAreaView, TextInput} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown'
 
@@ -33,9 +33,9 @@ const UpdateItemScreen = ( {route, navigation} ) => {
         };
 
         try {
-            const response = await fetch('http://localhost/inventory/update', submit);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/update', submit);
             const data = await response.json();
-            if (response.status === 400) {
+            if (data.status === 400) {
                 throw new Error('Submission failed');
             } else {
                 console.log(item_man)
@@ -47,13 +47,14 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             }
         } catch (error) {
             console.log(error);
+            console.log('the error is here')
             Alert.alert('Submission failed', error);
         }
     };
 
     // onSubmit of the entire form
     const onSubmit = () => {
-        if (action === 'Arrive') {
+        if (action === 'Arrived') {
             arrivingPOSTAPI()
         } else {
             submitPost()
@@ -62,25 +63,26 @@ const UpdateItemScreen = ( {route, navigation} ) => {
 
     // To generate all the items for the dropdown
     // need API to return name (item) only
-    const [itemarray, setItemArray] = React.useState([]);
+    const [itemarray, setItemArray] = React.useState([])
     const [itemID, setItemID] = React.useState([]);
     const [itemQty, setItemQty] = React.useState([]);
+
     const manualGet = async () => {
-        const manual = {
+        const search = {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         };
         try {
-            const response = await fetch('http://localhost/inventory/list', manual);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
             const data = await response.json();
             if (!response.ok) {
                 throw new Error('Item retrieve failed');
             } else {
-                const names = data.map(item => item.name);
+                const names = data.items.map(item => item.name);
                 setItemArray(names.concat(''));
-                const ids = data.map(item => item.id);
+                const ids = data.items.map(item => item.id);
                 setItemID(ids);
-                const quantities = data.map(item => item.qty);
+                const quantities = data.items.map(item => item.qty);
                 setItemQty(quantities);
             }
         } catch (error) {
@@ -88,9 +90,12 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             Alert.alert('Submission failed', error.message);
         }
     };
+    React.useEffect(() => {
+        manualGet();
+    }, []);
+
 
     // API call to GET "arriving" information
-    const [arrGetAPI, setarrArray] = React.useState([]);
     const [arrID, setArrID] = React.useState([]);
     const [arrQty, setarrQty] = React.useState([]);
 
@@ -100,25 +105,27 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             };
-            let endPoint = 'http://localhost/inventory/arriving';
+            let endPoint = 'https://managerpal.seewhyjay.dev/inventory/arriving';
             if (productId) {
                 endPoint += `?product_id=${productId}`;
             }
             const response = await fetch(endPoint, request);
             const data = await response.json();
-            if (response.ok) {
-                setarrArray(data.items);
-                const arrIDs = data.map(item => item.id);
-                const arrQtys = data.map(item => item.qty)
+            if (response.status === '200') {
+                const arrIDs = data.items.map(item => item.id);
+                const arrQtys = data.items.map(item => item.qty)
                 setArrID(arrIDs)
                 setarrQty(arrQtys)
+                console.log(arrID)
+                console.log(arrQty)
             } else {
-                return (
-                    <Text>{data.response}</Text>
-                );
+                console.log(error);
+                console.log('arriving 400 status')
+                Alert.alert('Failure', error.message);
             }
         } catch (error) {
             console.log(error);
+            console.log('arriving error')
             Alert.alert('Failure', error.message);
         }
     };
@@ -126,7 +133,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
     // API call to POST "arriving" information
     const arrivingPOSTAPI = async () => {
         try {
-            const endPoint = 'http://localhost/inventory/arriving'
+            const endPoint = 'https://managerpal.seewhyjay.dev/inventory/arriving'
             const response = await fetch(endPoint, {
                 method: 'POST',
                 headers: {
@@ -170,6 +177,8 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             onSelect={(selected, index) => {
                 setItem(selected);
                 itemExist(item_man)
+                console.log(id)
+                arrivingGETAPI(id);
             }}
             defaultValue={item_man}
             defaultButtonText={'Select Item'}
@@ -282,7 +291,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             <SelectDropdown
                 buttonStyle={styles.dropdown}
                 buttonTextStyle={styles.dropdownText}
-                data={months}
+                data={months()}
                 onSelect={(selected, index) => {
                     setDate_month(selected)
                 }}

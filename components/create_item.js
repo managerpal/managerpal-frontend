@@ -13,9 +13,10 @@ const CreateItemScreen = ( {navigation} ) => {
             })
         };
         try {
-            const response = await fetch('http://localhost/inventory/add_product', createItem);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/add_product', createItem);
             const data = await response.json();
             if (response.status === 400) {
+                console.log(response.status)
                 Alert.alert(
                     'Error',
                     'Error in creating new item',
@@ -23,8 +24,8 @@ const CreateItemScreen = ( {navigation} ) => {
                 );
             } else {
                 Alert.alert(
-                    'Error',
-                    'Error in creating new item',
+                    'Success',
+                    'Successfully created new item',
                     [{ text: 'Cancel', onPress: () => navigation.navigate('MainContainer')}]
                 );
             }

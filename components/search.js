@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, Image, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, FlatList} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, FlatList} from 'react-native';
 
 const SearchScreen = ( {navigation} ) => {
     const [itemarray, setItemArray] = React.useState([])
@@ -10,48 +10,27 @@ const SearchScreen = ( {navigation} ) => {
             headers: { 'Content-Type': 'application/json' }
         };
         try {
-            const response = await fetch('https://localhost/inventory/list', search);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
             const data = await response.json();
             if (!response.ok) {
                 throw new Error('Item retrieve failed');
             } else {
-                const names = data.items;
-                setItemArray(names);
+                // const names = data.items.map(item => item.name)
+                // console.log(names)
+                // setItemArray(names);
+                // console.log(itemarray)
+                const names = data.items
+                setItemArray(names)
+                console.log(itemarray)
             }
         } catch (error) {
             console.log(error);
             Alert.alert('Submission failed', error.message);
         }
     };
-
-    // For testing
-    // const itemarray = [
-    //     {
-    //         id: '1',
-    //         name: 'First Item',
-    //         qty: '1',
-    //     },
-    //     {
-    //         id: '2',
-    //         name: 'Second Item',
-    //         qty: '2',
-    //     },
-    //     {
-    //         id: '3',
-    //         name: 'Third Item',
-    //         qty: '3',
-    //     },
-    //     {
-    //         id: '4',
-    //         name: 'Fourth Item',
-    //         qty: '4',
-    //     },
-    //     {
-    //         id: '5',
-    //         name: 'Fifth Item',
-    //         qty: '5',
-    //     }
-    // ]
+    React.useEffect(() => {
+        searchGet();
+    }, []);
 
     const Item = ( {title, qty} ) => (
         <View>
@@ -118,3 +97,34 @@ const styles = StyleSheet.create({
 });
 
 export default SearchScreen
+
+
+
+// For testing
+// const itemarray = [
+//     {
+//         id: '1',
+//         name: 'First Item',
+//         qty: '1',
+//     },
+//     {
+//         id: '2',
+//         name: 'Second Item',
+//         qty: '2',
+//     },
+//     {
+//         id: '3',
+//         name: 'Third Item',
+//         qty: '3',
+//     },
+//     {
+//         id: '4',
+//         name: 'Fourth Item',
+//         qty: '4',
+//     },
+//     {
+//         id: '5',
+//         name: 'Fifth Item',
+//         qty: '5',
+//     }
+// ]

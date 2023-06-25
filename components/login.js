@@ -16,24 +16,25 @@ function LoginScreen({navigation}) {
     const [isChecked, setChecked] = React.useState(false)
     const [loginError, setLoginError] = React.useState('')
 
-    const loginRequest = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            email: textEmail,
-            password: textPW,
-            remember: isChecked
-        })
-    }
     const loginRest = async() => {
+        const loginRequest = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: textEmail,
+                password: textPW,
+                remember: isChecked
+            })
+        }
         try {
-            const response = await fetch('https://reqres.in/api/posts', loginRequest);
+            const response = await fetch('https://managerpal.seewhyjay.dev/auth/login', loginRequest);
             const data = await response.json();
 
             if (response.status === 400) {
+                console.log(response.status)
                 Alert.alert(
                     'Login unsuccessful',
-                    'Username/Password is wrong',
+                    'Username/Password is wrong: status = 400',
                     [{ text: 'Cancel', onPress: () => {}}]
                 );
             } else {
@@ -48,7 +49,11 @@ function LoginScreen({navigation}) {
             }
         } catch (error) {
             console.log(error)
-            setLoginError('Username/Password does not match');
+            Alert.alert(
+                'Login unsuccessful',
+                'Username/Password is wrong',
+                [{ text: 'Cancel', onPress: () => {}}]
+            );;
         }
     }
 
