@@ -1,40 +1,37 @@
-import React, {Component} from 'react';
-import {Text, StyleSheet, View, SafeAreaView} from 'react-native';
+import React from 'react';
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Link } from '@react-navigation/native';
 
 import LoginScreen from "./components/login";
-import HomeScreen from "./components/home";
+import MainContainer from "./components/mainContainer";
 import RegisterScreen from "./components/register";
+import LogoutScreen from "./components/logout";
+import UpdateItemScreen from "./components/update_item";
+import ProductDetails from "./components/productDetails";
+import CreateItemScreen from "./components/create_item";
 
 const Stack = createNativeStackNavigator();
 function App() {
   return (
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen component={LoginScreen} name={"LoginScreen"}/>
-          <Stack.Screen component = {HomeScreen} name={"HomeScreen"}/>
-          <Stack.Screen component = {RegisterScreen} name={"RegisterScreen"}/>
+            <Stack.Screen
+                name="SignIn"
+                component={LoginScreen}
+                options={{
+                  title: 'Sign in',
+                }}
+            />
+            <Stack.Screen name="Register" component={RegisterScreen}/>
+            <Stack.Screen name="MainContainer" component={MainContainer} />
+            <Stack.Screen name="Log out" component={LogoutScreen}/>
+            <Stack.Screen name="UpdateItemScreen" component={UpdateItemScreen}/>
+            <Stack.Screen name="productDetails" component={ProductDetails}/>
+            <Stack.Screen name="CreateItemScreen" component={CreateItemScreen}/>
         </Stack.Navigator>
       </NavigationContainer>
-  )
+  );
 }
-
-const styles = StyleSheet.create({
-  baseText: {
-    fontFamily: 'Cochin',
-  },
-  titleText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  }
-});
 
 export default App

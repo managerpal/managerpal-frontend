@@ -2,13 +2,10 @@ import React from 'react';
 import {
     SafeAreaView,
     Button,
-    View,
     Text,
-    TextInput,
-    StyleSheet
 } from 'react-native';
 
-const HomeScreen = ({navigation}) => {
+const ProfileScreen = ({navigation}) => {
     return (
         <SafeAreaView>
             <Text style={{
@@ -21,10 +18,10 @@ const HomeScreen = ({navigation}) => {
             </Text>
             <Button
                 title={'Logout'}
-                onPress={() => navigation.navigate('LoginScreen')}
+                onPress={() => navigation.navigate('SignIn')}
             />
         </SafeAreaView>
     )
 }
 
-export default HomeScreen
+export default ProfileScreen
