@@ -15,7 +15,7 @@ const SearchScreen = ( {navigation} ) => {
     //         if (!response.ok) {
     //             throw new Error('Item retrieve failed');
     //         } else {
-    //             const names = data.map(item => item.name);
+    //             const names = data.map(item => item.product_name);
     //             setItemArray(names);
     //         }
     //     } catch (error) {

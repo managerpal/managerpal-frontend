@@ -181,9 +181,7 @@ function RegisterScreen({ navigation }) {
                         isLength(textPW) &&
                         isValidPWCopy(textPWcopy)
                     ) {
-                        isValidUsernamePost().then(() => {
-                            registerPost();
-                        });
+                        registerPost();
                     } else {
                         Alert.alert(
                             'Registration unsuccessful',

@@ -4,38 +4,34 @@ import SelectDropdown from 'react-native-select-dropdown'
 import {Checkbox} from "expo-checkbox";
 
 const UpdateItemScreen = ( {route, navigation} ) => {
-    const { item, arriving, arrivingQty, quantity, manual } = route.params
+    const { ID, item, quantity, manual } = route.params
 
+    const [id, setID] = React.useState(ID)
     const [item_man, setItem] = React.useState(item)
-    const [arr_man, setArr] = React.useState(arriving)
-    const [arrQty_man, setArrQty] = React.useState(arrivingQty)
-
-    const [id, setID] = React.useState(0)
-    const [action, setAction] = React.useState('')
     const [qty, setQty] = React.useState(quantity)
+
+    // const [arr_man, setArr] = React.useState(arriving)
+    // const [arrQty_man, setArrQty] = React.useState(arrivingQty)
+    const [action, setAction] = React.useState('')
     const [price, setPrice] = React.useState(0.00)
     const [date_day, setDate_day] = React.useState(0)
     const [date_month, setDate_month] = React.useState('')
     const [date_year, setDate_year] = React.useState(0)
     const [user, setUser] = React.useState('')
-    const [isChecked, setChecked] = React.useState(false)
+    // const [isChecked, setChecked] = React.useState(false)
 
-    // on submit action need to submit the form via API call
+    // API POST request when submitting
     const submitPost = async () => {
         const submit = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                item: item_man,
+                product_id: id,
                 action: action,
-                quantity: qty,
                 price:  price/qty, // value sent is per piece
+                quantity: qty,
                 date: date_year + '-' + date_month + '-' + date_day,
-                // date_day: date_day,
-                // date_month: date_month,
-                // date_year: date_year,
                 user: user,
-                isChecked: isChecked
             })
         };
 
@@ -75,8 +71,6 @@ const UpdateItemScreen = ( {route, navigation} ) => {
         }
     }
 
-    // For manual updates
-
     // To generate all the items for the dropdown
     // need API to return name (item) only
     let itemarray = []
@@ -98,6 +92,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     itemID.push(dta.id);
                     itemQty.push(dta.qty)
                 }
+                itemarray.push('')
             }
         } catch (error) {
             console.log(error);
@@ -105,8 +100,26 @@ const UpdateItemScreen = ( {route, navigation} ) => {
         }
     };
 
-    // API call to get "arriving" information
-    const arrivingAPI = async () => {
+    // API call to GET "arriving" information
+    let arrGetAPI
+    const arrivingGETAPI = async () => {
+        try {
+            const endPoint = 'localhost/inventory/arriving'
+            const response = await fetch(endPoint);
+            const data = await response.json();
+            if (data.response === '200') {
+
+            } else {
+
+            }
+        } catch (error) {
+            console.log(error);
+            Alert.alert('Submission failed', error.message);
+        }
+    };
+
+    // API call to POST "arriving" information
+    const arrivingPOSTAPI = async () => {
         try {
             const endPoint = 'localhost/inventory/arriving'
 
@@ -141,7 +154,6 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             Alert.alert('Submission failed', error.message);
         }
     };
-
     const itemExist = (name) => {
         const index = itemarray.indexOf(name)
         setItem(name)

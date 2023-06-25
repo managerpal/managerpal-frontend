@@ -9,39 +9,37 @@ const UpdateScreen = ( {navigation} ) => {
     const [text, setText] = useState('Please scan item QR code');
     const [item, setItem] = useState('test');
 
-    // API call to search for item exist
-    const itemExist = async () => {
-        const itemExist = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                itemName: item
-            })
+    // API call to search for item exist (for QR code)
+    const [itemarray, setItemArray] = React.useState([])
+    const [itemID, setID] = React.useState([])
+    const [itemqty, setItemQty] = React.useState([])
+    const searchGet = async () => {
+        const search = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
         };
         try {
-            const response = await fetch('https://web.postman.co/workspace/My-Workspace~1baef2b9-bec7-452d-88bf-07805f7e6ea4/request/27917960-207da089-5dca-46cf-a4d5-d352c4cf6663', itemExist);
+            const response = await fetch('https://reqres.in/api/posts', search);
             const data = await response.json();
-            if (response.status === 400) {
-                Alert.alert(
-                    'Error',
-                    'Item does not exist',
-                    [{ text: 'Cancel', onPress: () => {}}]
-                );
+            if (!response.ok) {
+                throw new Error('Item retrieve failed');
             } else {
-                navigation.navigate('UpdateItemScreen',
-                    {
-                        item: data.item,
-                        arriving: data.arriving,
-                        arrivingQty: data.arrivingQty,
-                        quantity: data.quantity,
-                        manual: false
-                    }
-                )
+                const names = data.map(item => item.name);
+                setItemArray(names);
+                const id = data.map(item => item.id);
+                setID(id)
+                const qty = data.map(item => item.qty);
+                setItemQty(qty)
             }
         } catch (error) {
-            return (<Text> {error} </Text>)
+            console.log(error);
+            Alert.alert('Submission failed', error.message);
         }
     };
+    const itemExist = (item) => {
+        return itemarray.includes(item)
+    };
+
     const askForCameraPermission = () => {
         (async () => {
             const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -59,8 +57,24 @@ const UpdateScreen = ( {navigation} ) => {
         setScanned(true);
         setText('Item scanned')
         setItem(data)
-        console.log( {item} )
-        itemExist()
+        console.log( item )
+
+        if (itemExist(item)) {
+            const index = itemarray.indexOf(item)
+            const qty = itemqty[index]
+            const ID = itemID[index]
+            navigation.navigate('UpdateItemScreen', {
+                itemID: ID,
+                item: item,
+                qty: qty,
+                manual: false
+            })
+        } else {
+            Alert.alert('Error',
+                'Item does not exist',
+                [{ text: 'Cancel', onPress: () => {}}]
+                )
+        }
     };
 
     // Check permissions and return the screens
@@ -92,10 +106,9 @@ const UpdateScreen = ( {navigation} ) => {
                 onPress={() => {
                     navigation.navigate('UpdateItemScreen',
                         {
+                            itemID: 0,
                             item: '',
-                            arriving: false,
-                            arrivingQty: 0,
-                            quantity: 0,
+                            qty: 0,
                             manual: true
                         }
                     )

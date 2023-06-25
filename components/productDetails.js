@@ -10,6 +10,7 @@ import {
     Touchable,
     TouchableOpacity
 } from 'react-native';
+import QRCode from 'react-native-qrcode-svg'
 import SelectDropdown from 'react-native-select-dropdown'
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 
@@ -18,71 +19,71 @@ const ProductDetails = ( {route} ) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
-    LocaleConfig.locales['fr'] = {
-        monthNames: [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December'
-        ],
-        monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
-        dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        dayNamesShort: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-        today: "Today"
-    };
-
-    LocaleConfig.defaultLocale = 'fr';
-
-    const calendarStart = () => {
-        return (
-            <View>
-                <Calendar style = {styles.calendarStart}
-                          onDayPress={day => {
-                              setStartDate(day.dateString);
-                          }}
-                          markedDates={{
-                              [startDate]: {startDate: true, disableTouchEvent: true, selectedDotColor: 'orange'}
-                          }}
-                />
-            </View>
-        )
-    }
-
-    const calendarEnd =
-        <View>
-            <Calendar style = {styles.calendarEnd}
-                      onDayPress={day => {
-                          setEndDate(day.dateString);
-                      }}
-                      markedDates={{
-                          [endDate]: {endDate: true, disableTouchEvent: true, selectedDotColor: 'orange'}
-                      }}
-            />
-        </View>
-
-    const dateBar =
-        <View>
-            <TouchableOpacity
-                style={{color: (startDate == '') ? 'grey' : 'black'}}
-                onPress={() => calendarStart()}
-            >
-                <Text>
-                    {(startDate == '') ? 'Start Date' : startDate}
-                </Text>
-            </TouchableOpacity>
-        </View>
-
-    const enterDate = () => {
-
-    }
+    // LocaleConfig.locales['fr'] = {
+    //     monthNames: [
+    //         'January',
+    //         'February',
+    //         'March',
+    //         'April',
+    //         'May',
+    //         'June',
+    //         'July',
+    //         'August',
+    //         'September',
+    //         'October',
+    //         'November',
+    //         'December'
+    //     ],
+    //     monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
+    //     dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    //     dayNamesShort: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+    //     today: "Today"
+    // };
+    //
+    // LocaleConfig.defaultLocale = 'fr';
+    //
+    // const calendarStart = () => {
+    //     return (
+    //         <View>
+    //             <Calendar style = {styles.calendarStart}
+    //                       onDayPress={day => {
+    //                           setStartDate(day.dateString);
+    //                       }}
+    //                       markedDates={{
+    //                           [startDate]: {startDate: true, disableTouchEvent: true, selectedDotColor: 'orange'}
+    //                       }}
+    //             />
+    //         </View>
+    //     )
+    // }
+    //
+    // const calendarEnd =
+    //     <View>
+    //         <Calendar style = {styles.calendarEnd}
+    //                   onDayPress={day => {
+    //                       setEndDate(day.dateString);
+    //                   }}
+    //                   markedDates={{
+    //                       [endDate]: {endDate: true, disableTouchEvent: true, selectedDotColor: 'orange'}
+    //                   }}
+    //         />
+    //     </View>
+    //
+    // const dateBar =
+    //     <View>
+    //         <TouchableOpacity
+    //             style={{color: (startDate == '') ? 'grey' : 'black'}}
+    //             onPress={() => calendarStart()}
+    //         >
+    //             <Text>
+    //                 {(startDate == '') ? 'Start Date' : startDate}
+    //             </Text>
+    //         </TouchableOpacity>
+    //     </View>
+    //
+    // const enterDate = () => {
+    //
+    // }
 
     return (
         <SafeAreaView>
@@ -95,7 +96,9 @@ const ProductDetails = ( {route} ) => {
                 <Text style={styles.text}>Quantity: {quantity} </Text>
                 <Text style={styles.text}>Arriving: {arrivingQty}</Text>
             </View>
-            {dateBar}
+            <View style ={{alignItems: 'center'}}>
+                <QRCode value={item}/>
+            </View>
         </SafeAreaView>
     )
 }

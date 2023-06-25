@@ -27,7 +27,7 @@ function LoginScreen({navigation}) {
     }
     const loginRest = async() => {
         try {
-            const response = await fetch('http://localhost/auth/login', loginRequest);
+            const response = await fetch('https://reqres.in/api/posts', loginRequest);
             const data = await response.json();
 
             if (response.status === 400) {
@@ -47,6 +47,7 @@ function LoginScreen({navigation}) {
                 );
             }
         } catch (error) {
+            console.log(error)
             setLoginError('Username/Password does not match');
         }
     }
