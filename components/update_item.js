@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {Text, View, StyleSheet, Button, Alert, SafeAreaView, TextInput} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown'
-import {Checkbox} from "expo-checkbox";
 
 const UpdateItemScreen = ( {route, navigation} ) => {
     const { ID, item, quantity, manual } = route.params
@@ -10,15 +9,13 @@ const UpdateItemScreen = ( {route, navigation} ) => {
     const [item_man, setItem] = React.useState(item)
     const [qty, setQty] = React.useState(quantity)
 
-    // const [arr_man, setArr] = React.useState(arriving)
-    // const [arrQty_man, setArrQty] = React.useState(arrivingQty)
     const [action, setAction] = React.useState('')
     const [price, setPrice] = React.useState(0.00)
     const [date_day, setDate_day] = React.useState(0)
     const [date_month, setDate_month] = React.useState('')
     const [date_year, setDate_year] = React.useState(0)
     const [user, setUser] = React.useState('')
-    // const [isChecked, setChecked] = React.useState(false)
+    const [update_id, setupdateID] = React.useState('') // for arriving
 
     // API POST request when submitting
     const submitPost = async () => {
@@ -36,7 +33,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
         };
 
         try {
-            const response = await fetch('localhost/inventory/update', submit);
+            const response = await fetch('http://localhost/inventory/update', submit);
             const data = await response.json();
             if (response.status === 400) {
                 throw new Error('Submission failed');
@@ -57,15 +54,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
     // onSubmit of the entire form
     const onSubmit = () => {
         if (action === 'Arrive') {
-            if (!isChecked) {
-                Alert.alert(
-                    'Error',
-                    'Please confirm item has arrived',
-                    [{ text: 'Cancel', onPress: () => {} }]
-                );
-            } else {
-                submitPost()
-            }
+            arrivingPOSTAPI()
         } else {
             submitPost()
         }
@@ -73,26 +62,26 @@ const UpdateItemScreen = ( {route, navigation} ) => {
 
     // To generate all the items for the dropdown
     // need API to return name (item) only
-    let itemarray = []
-    let itemID = []
-    let itemQty = []
+    const [itemarray, setItemArray] = React.useState([]);
+    const [itemID, setItemID] = React.useState([]);
+    const [itemQty, setItemQty] = React.useState([]);
     const manualGet = async () => {
         const manual = {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         };
         try {
-            const response = await fetch('localhost/inventory/list', manual);
+            const response = await fetch('http://localhost/inventory/list', manual);
             const data = await response.json();
             if (!response.ok) {
                 throw new Error('Item retrieve failed');
             } else {
-                for (const dta of data) {
-                    itemarray.push(dta.name);
-                    itemID.push(dta.id);
-                    itemQty.push(dta.qty)
-                }
-                itemarray.push('')
+                const names = data.map(item => item.name);
+                setItemArray(names.concat(''));
+                const ids = data.map(item => item.id);
+                setItemID(ids);
+                const quantities = data.map(item => item.qty);
+                setItemQty(quantities);
             }
         } catch (error) {
             console.log(error);
@@ -101,112 +90,112 @@ const UpdateItemScreen = ( {route, navigation} ) => {
     };
 
     // API call to GET "arriving" information
-    let arrGetAPI
-    const arrivingGETAPI = async () => {
+    const [arrGetAPI, setarrArray] = React.useState([]);
+    const [arrID, setArrID] = React.useState([]);
+    const [arrQty, setarrQty] = React.useState([]);
+
+    const arrivingGETAPI = async (productId) => {
         try {
-            const endPoint = 'localhost/inventory/arriving'
-            const response = await fetch(endPoint);
+            const request = {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            };
+            let endPoint = 'http://localhost/inventory/arriving';
+            if (productId) {
+                endPoint += `?product_id=${productId}`;
+            }
+            const response = await fetch(endPoint, request);
             const data = await response.json();
-            if (data.response === '200') {
-
+            if (response.ok) {
+                setarrArray(data.items);
+                const arrIDs = data.map(item => item.id);
+                const arrQtys = data.map(item => item.qty)
+                setArrID(arrIDs)
+                setarrQty(arrQtys)
             } else {
-
+                return (
+                    <Text>{data.response}</Text>
+                );
             }
         } catch (error) {
             console.log(error);
-            Alert.alert('Submission failed', error.message);
+            Alert.alert('Failure', error.message);
         }
     };
 
     // API call to POST "arriving" information
     const arrivingPOSTAPI = async () => {
         try {
-            const endPoint = 'localhost/inventory/arriving'
-
-            // GET request
-            const response = await fetch(endPoint);
+            const endPoint = 'http://localhost/inventory/arriving'
+            const response = await fetch(endPoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: update_id
+                }),
+            });
             const data = await response.json();
             if (data.response === '200') {
-
+                Alert.alert(
+                    'Successful',
+                    item_man + ' has been successfully updated',
+                    [{ text: 'Cancel', onPress: () => navigation.navigate('MainContainer') }]
+                );
             } else {
-
+                return (
+                    <Text> {data.response} </Text>
+                )
             }
-
-            // POST request
-            const POST = await fetch (endPoint,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: id,
-                    }),
-                }
-            )
-            const updateData = await POST.json();
-            if (updateData.response === '200') {
-
-            } else {
-
-            }
-
         } catch (error) {
             console.log(error);
-            Alert.alert('Submission failed', error.message);
+            Alert.alert('Update failed', error.message);
         }
     };
+
     const itemExist = (name) => {
         const index = itemarray.indexOf(name)
-        setItem(name)
         setQty(itemQty[index])
         setID(itemID[index])
-
-        setArr(data.arriving)
-        setArrQty(data.arrivingQty)
-
     }
 
     let updateManView;
 
-    if (manual) {
-        updateManView = (
-            <SelectDropdown
-                buttonStyle={styles.dropdown}
-                buttonTextStyle={styles.dropdownText}
-                data={itemarray}
-                onSelect={(selected, index) => {
-                    setItem(selected);
-                    itemExist()
-                }}
-                defaultButtonText={'Select Item'}
-                buttonTextAfterSelection={(selected, index) => {
-                    return selected;
-                }}
-                rowTextForSelection={(item, index) => {
-                    return item;
-                }}
-            />
-        );
-    } else {
-        updateManView = (
-            <Text style={styles.text}>
-                Item: {item_man}
-            </Text>
-        );
-    }
+    updateManView = (
+        <SelectDropdown
+            buttonStyle={styles.dropdown}
+            buttonTextStyle={styles.dropdownText}
+            data={itemarray}
+            onSelect={(selected, index) => {
+                setItem(selected);
+                itemExist(item_man)
+            }}
+            defaultValue={item_man}
+            defaultButtonText={'Select Item'}
+            buttonTextAfterSelection={(selected, index) => {
+                return selected;
+            }}
+            rowTextForSelection={(item, index) => {
+                return item;
+            }}
+        />
+    );
+
 
     // For dropdown of actions
-    const createDropdownAction = () => {
-        if (arr_man) {
-            console.log('item is arriving: ' + arr_man)
+    const createDropdownAction = (item) => {
+        if (arrID.length > 0) {
+            console.log('item is arriving: true')
             return ["Buy", "Sell", "Arrived"]
         } else {
-            console.log('item is arriving: ' + arr_man)
+            console.log('item is arriving: false')
             return ["Buy", "Sell"]
         }
     }
 
     let actionsView;
-    if (manual && item_man !== null || !manual) {
+    if (manual && item_man !== '' || !manual) {
         actionsView =
             <View style={styles.rowContain}>
                 <Text style={styles.text}>
@@ -215,9 +204,12 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 <SelectDropdown
                     buttonStyle={styles.dropdown}
                     buttonTextStyle={styles.dropdownText}
-                    data={createDropdownAction()}
+                    data={createDropdownAction(item_man)}
                     onSelect={(selectedItem, index) => {
                         setAction(selectedItem)
+                        if (selectedItem === 'Arrived') {
+                            arrivingGETAPI(id)
+                        }
                     }}
                     defaultButtonText={'Select Action'}
                     buttonTextAfterSelection={(selectedItem, index) => {
@@ -229,7 +221,6 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 />
             </View>
     }
-
 
     // for dropdown of quantity (if action is sell)
     const createDropdownQty = () => {
@@ -338,7 +329,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             />
         </View>
 
-    // actual display
+    // actual display after selecting action
     let content
     if (action === 'Sell') {
         content = (
@@ -419,17 +410,14 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     {date}
                 </View>
                 <View style={styles.arriveConfirm}>
-                    <Checkbox
-                        style = {styles.checkbox}
-                        value = {isChecked}
-                        onValueChange={setChecked}
-                        color={isChecked ? '#4630EB' : undefined}
+                    <SelectDropdown
+                        data={arrQty}
+                        onSelect={(selected, index) => {
+                            setupdateID(index)
+                        }}
                     />
-                    <Text>
-                        Confirm {arrQty_man} of {item_man} has arrived
-                    </Text>
                 </View>
-                <Button title={'Submit'} onPress={() => {onSubmit()}} />
+                <Button title={'Submit'} onPress={() => {arrivingPOSTAPI()}} />
             </View>
         )
     }

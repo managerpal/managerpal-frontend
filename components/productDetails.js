@@ -15,7 +15,7 @@ import SelectDropdown from 'react-native-select-dropdown'
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 
 const ProductDetails = ( {route} ) => {
-    const {item, arrivingQty, quantity} = route.params
+    const {item, quantity} = route.params
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
@@ -94,7 +94,6 @@ const ProductDetails = ( {route} ) => {
             </View>
             <View>
                 <Text style={styles.text}>Quantity: {quantity} </Text>
-                <Text style={styles.text}>Arriving: {arrivingQty}</Text>
             </View>
             <View style ={{alignItems: 'center'}}>
                 <QRCode value={item}/>

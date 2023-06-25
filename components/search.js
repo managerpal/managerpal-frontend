@@ -2,63 +2,58 @@ import React from 'react';
 import {Text, Image, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, FlatList} from 'react-native';
 
 const SearchScreen = ( {navigation} ) => {
-    // const [itemarray, setItemArray] = React.useState([])
-    //
-    // const searchGet = async () => {
-    //     const search = {
-    //         method: 'GET',
-    //         headers: { 'Content-Type': 'application/json' }
-    //     };
-    //     try {
-    //         const response = await fetch('https://reqres.in/api/posts', search);
-    //         const data = await response.json();
-    //         if (!response.ok) {
-    //             throw new Error('Item retrieve failed');
-    //         } else {
-    //             const names = data.map(item => item.product_name);
-    //             setItemArray(names);
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //         Alert.alert('Submission failed', error.message);
-    //     }
-    // };
+    const [itemarray, setItemArray] = React.useState([])
+
+    const searchGet = async () => {
+        const search = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        };
+        try {
+            const response = await fetch('https://localhost/inventory/list', search);
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error('Item retrieve failed');
+            } else {
+                const names = data.items;
+                setItemArray(names);
+            }
+        } catch (error) {
+            console.log(error);
+            Alert.alert('Submission failed', error.message);
+        }
+    };
 
     // For testing
-    const itemarray = [
-        {
-            id: '1',
-            item: 'First Item',
-            quantity: '1',
-            arrivingQty: '1'
-        },
-        {
-            id: '2',
-            item: 'Second Item',
-            quantity: '2',
-            arrivingQty: '2'
-        },
-        {
-            id: '3',
-            item: 'Third Item',
-            quantity: '3',
-            arrivingQty: '3'
-        },
-        {
-            id: '4',
-            item: 'Fourth Item',
-            quantity: '4',
-            arrivingQty: '4'
-        },
-        {
-            id: '5',
-            item: 'Fifth Item',
-            quantity: '5',
-            arrivingQty: '5'
-        }
-    ]
+    // const itemarray = [
+    //     {
+    //         id: '1',
+    //         name: 'First Item',
+    //         qty: '1',
+    //     },
+    //     {
+    //         id: '2',
+    //         name: 'Second Item',
+    //         qty: '2',
+    //     },
+    //     {
+    //         id: '3',
+    //         name: 'Third Item',
+    //         qty: '3',
+    //     },
+    //     {
+    //         id: '4',
+    //         name: 'Fourth Item',
+    //         qty: '4',
+    //     },
+    //     {
+    //         id: '5',
+    //         name: 'Fifth Item',
+    //         qty: '5',
+    //     }
+    // ]
 
-    const Item = ( {title, qty, arr} ) => (
+    const Item = ( {title, qty} ) => (
         <View>
             <TouchableOpacity
                 style={styles.card}
@@ -66,14 +61,12 @@ const SearchScreen = ( {navigation} ) => {
                     {
                         item: title,
                         quantity: qty,
-                        arrivingQty: arr,
                     }
                 )}
             >
                 <View style={styles.infoContainer}>
                     <Text style={styles.name}> {title} </Text>
                     <Text style={styles.qty}>Quantity: {qty} </Text>
-                    <Text style={styles.qty}>Arriving: {arr}</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -84,9 +77,8 @@ const SearchScreen = ( {navigation} ) => {
             <FlatList
                 data={itemarray}
                 renderItem={
-                    ({item}) => <Item title={item.item}
-                                     qty = {item.quantity}
-                                     arr = {item.arrivingQty}
+                    ({item}) => <Item title={item.name}
+                                     qty = {item.qty}
                     />
                 }
             />

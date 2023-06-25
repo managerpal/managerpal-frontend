@@ -9,7 +9,7 @@ const CreateItemScreen = ( {navigation} ) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                itemName: item
+                name: item
             })
         };
         try {
