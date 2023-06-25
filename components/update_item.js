@@ -35,7 +35,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
         try {
             const response = await fetch('https://managerpal.seewhyjay.dev/inventory/update', submit);
             const data = await response.json();
-            if (data.status === 400) {
+            if (response.status === 400) {
                 throw new Error('Submission failed');
             } else {
                 console.log(item_man)
@@ -103,7 +103,6 @@ const UpdateItemScreen = ( {route, navigation} ) => {
         try {
             const request = {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
             };
             let endPoint = 'https://managerpal.seewhyjay.dev/inventory/arriving';
             if (productId) {
@@ -111,17 +110,14 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             }
             const response = await fetch(endPoint, request);
             const data = await response.json();
-            if (response.status === '200') {
+            if (response.status === 200) {
                 const arrIDs = data.items.map(item => item.id);
                 const arrQtys = data.items.map(item => item.qty)
                 setArrID(arrIDs)
                 setarrQty(arrQtys)
-                console.log(arrID)
-                console.log(arrQty)
             } else {
-                console.log(error);
                 console.log('arriving 400 status')
-                Alert.alert('Failure', error.message);
+                Alert.alert('Failure', 'Unable to retrieve information');
             }
         } catch (error) {
             console.log(error);
@@ -140,11 +136,12 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: update_id
+                    id: update_id,
+                    arrived: true
                 }),
             });
             const data = await response.json();
-            if (data.response === '200') {
+            if (response.status === 200) {
                 Alert.alert(
                     'Successful',
                     item_man + ' has been successfully updated',
@@ -152,7 +149,10 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 );
             } else {
                 return (
-                    <Text> {data.response} </Text>
+                    Alert.alert('Update failed',
+                        'error updating',
+                        [{text: 'Cancel', onPress: () => {}}]
+                    )
                 )
             }
         } catch (error) {
@@ -177,7 +177,6 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             onSelect={(selected, index) => {
                 setItem(selected);
                 itemExist(item_man)
-                console.log(id)
                 arrivingGETAPI(id);
             }}
             defaultValue={item_man}
@@ -216,9 +215,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     data={createDropdownAction(item_man)}
                     onSelect={(selectedItem, index) => {
                         setAction(selectedItem)
-                        if (selectedItem === 'Arrived') {
-                            arrivingGETAPI(id)
-                        }
+                        arrivingGETAPI(id)
                     }}
                     defaultButtonText={'Select Action'}
                     buttonTextAfterSelection={(selectedItem, index) => {
@@ -422,7 +419,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     <SelectDropdown
                         data={arrQty}
                         onSelect={(selected, index) => {
-                            setupdateID(index)
+                            setupdateID(arrID[index])
                         }}
                     />
                 </View>
