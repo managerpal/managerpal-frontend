@@ -13,6 +13,7 @@ const UpdateScreen = ( {navigation} ) => {
     const [itemarray, setItemArray] = React.useState([])
     const [itemID, setID] = React.useState([])
     const [itemqty, setItemQty] = React.useState([])
+
     const searchGet = async () => {
         const search = {
             method: 'GET',
@@ -21,23 +22,32 @@ const UpdateScreen = ( {navigation} ) => {
         try {
             const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
             const data = await response.json();
-            if (!response.ok) {
+            if (response.status === 400) {
                 throw new Error('Item retrieve failed');
             } else {
-                const names = data.map(item => item.name);
+                const names = data.items.map(item => item.name);
                 setItemArray(names);
-                const id = data.map(item => item.id);
+                const id = data.items.map(item => item.id);
                 setID(id)
-                const qty = data.map(item => item.qty);
+                const qty = data.items.map(item => item.qty);
                 setItemQty(qty)
             }
         } catch (error) {
-            console.log(error);
+            console.log('searchGet has an error the error is here' + error);
             Alert.alert('Submission failed', error.message);
         }
+        finally {
+            console.log('exit searchGet')
+            return
+        }
     };
-    const itemExist = (item) => {
-        return itemarray.includes(item)
+
+    React.useEffect(() => {
+        searchGet();
+    }, []);
+
+    const itemExist = async (item) => {
+        return itemarray.includes(item);
     };
 
     const askForCameraPermission = () => {
@@ -54,24 +64,29 @@ const UpdateScreen = ( {navigation} ) => {
 
     // After scanning
     const handleBarCodeScanned = ({type, data}) => {
+        const scannedItem = data
         setScanned(true);
         setText('Item scanned')
-        setItem(data)
-        console.log( item )
+        setItem(scannedItem)
+        console.log('item scanned is: ' + item + ' in handleBarCodeScanned')
 
-        if (itemExist(item)) {
-            const index = itemarray.indexOf(item)
+        if (itemExist(scannedItem)) {
+            const index = itemarray.indexOf(scannedItem)
             const qty = itemqty[index]
             const ID = itemID[index]
+            console.log(ID + ' : item ID after barcode scan')
+            console.log(qty + ' : quantity after barcode scan')
+            console.log(item + ' : item name after barcode scan')
+
             navigation.navigate('UpdateItemScreen', {
-                itemID: ID,
+                ID: ID,
                 item: item,
-                qty: qty,
+                quantity: qty,
                 manual: false
             })
         } else {
             Alert.alert('Error',
-                'Item does not exist',
+                data + ' ' + ' ' + item + ' ' + itemExist(item),
                 [{ text: 'Cancel', onPress: () => {}}]
                 )
         }
@@ -97,7 +112,9 @@ const UpdateScreen = ( {navigation} ) => {
         <View style={styles.container}>
             <View style={styles.barcodebox}>
                 <BarCodeScanner
-                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                    onBarCodeScanned={
+                        scanned ? undefined : handleBarCodeScanned
+                    }
                     style={{ height: 400, width: 400 }} />
             </View>
             <Text style={styles.maintext}>{text}</Text>
@@ -106,9 +123,9 @@ const UpdateScreen = ( {navigation} ) => {
                 onPress={() => {
                     navigation.navigate('UpdateItemScreen',
                         {
-                            itemID: 0,
+                            ID: 0,
                             item: '',
-                            qty: 0,
+                            quantity: 0,
                             manual: true
                         }
                     )

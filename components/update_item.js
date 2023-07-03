@@ -7,14 +7,15 @@ const UpdateItemScreen = ( {route, navigation} ) => {
 
     const [id, setID] = React.useState(ID)
     const [item_man, setItem] = React.useState(item)
-    const [qty, setQty] = React.useState(quantity)
+    const [qty, setQty] = React.useState(quantity) // for buy quantity
 
     const [action, setAction] = React.useState('')
-    const [price, setPrice] = React.useState(0.00)
+    const [price, setPrice] = React.useState(0)
     const [date_day, setDate_day] = React.useState(0)
     const [date_month, setDate_month] = React.useState('')
     const [date_year, setDate_year] = React.useState(0)
     const [user, setUser] = React.useState('')
+
     const [update_id, setupdateID] = React.useState('') // for arriving
 
     // API POST request when submitting
@@ -38,7 +39,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             if (response.status === 400) {
                 throw new Error('Submission failed');
             } else {
-                console.log(item_man)
+                console.log('submitPost, item being submitted is' + item_man)
                 Alert.alert(
                     'Successful',
                     item_man + ' has been successfully updated',
@@ -46,8 +47,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 );
             }
         } catch (error) {
-            console.log(error);
-            console.log('the error is here')
+            console.log(error + ' error is at submitPost');
             Alert.alert('Submission failed', error);
         }
     };
@@ -86,14 +86,15 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 setItemQty(quantities);
             }
         } catch (error) {
-            console.log(error);
+            console.log(error + ' error is at manualGet');
             Alert.alert('Submission failed', error.message);
         }
     };
+
     React.useEffect(() => {
         manualGet();
+        console.log(item_man + ' - name after initialisation - in React.useEffect')
     }, []);
-
 
     // API call to GET "arriving" information
     const [arrID, setArrID] = React.useState([]);
@@ -116,12 +117,11 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 setArrID(arrIDs)
                 setarrQty(arrQtys)
             } else {
-                console.log('arriving 400 status')
-                Alert.alert('Failure', 'Unable to retrieve information');
+                console.log('status 400 error is at arrivingGETAPI')
+                Alert.alert('Failure', 'Unable to retrieve arriving information');
             }
         } catch (error) {
-            console.log(error);
-            console.log('arriving error')
+            console.log(error + ' error is at arrivingGETAPI');
             Alert.alert('Failure', error.message);
         }
     };
@@ -156,48 +156,61 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 )
             }
         } catch (error) {
-            console.log(error);
+            console.log(error + ' error is at arrivingPOSTAPI');
             Alert.alert('Update failed', error.message);
         }
     };
 
-    const itemExist = (name) => {
-        const index = itemarray.indexOf(name)
-        setQty(itemQty[index])
-        setID(itemID[index])
+    const index = itemarray.indexOf(item_man)
+
+    const updateManView =  () => {
+        if (!manual) {
+            React.useEffect(() => {
+                arrivingGETAPI(ID);
+            }, []);
+            console.log(ID + ' updateManView - ID for QR code')
+            console.log(item + ' updateManView - item name for QR code')
+            console.log(quantity + 'updateManView - quantity for QR code')
+        }
+        return (
+            <SelectDropdown
+                buttonStyle={styles.dropdown}
+                buttonTextStyle={styles.dropdownText}
+                data={itemarray}
+                onSelect={(selected, index) => {
+                    setItem(selected);
+                    setQty(itemQty[index]);
+                    setID(itemID[index]);
+                    arrivingGETAPI(id);
+                }}
+                defaultValueByIndex={index}
+                defaultButtonText={'Select Item'}
+                buttonTextAfterSelection={(selected, index) => {
+                    return selected;
+                }}
+                rowTextForSelection={(item, index) => {
+                    return item;
+                }}
+            />
+        )
     }
 
-    let updateManView;
 
-    updateManView = (
-        <SelectDropdown
-            buttonStyle={styles.dropdown}
-            buttonTextStyle={styles.dropdownText}
-            data={itemarray}
-            onSelect={(selected, index) => {
-                setItem(selected);
-                itemExist(item_man)
-                arrivingGETAPI(id);
-            }}
-            defaultValue={item_man}
-            defaultButtonText={'Select Item'}
-            buttonTextAfterSelection={(selected, index) => {
-                return selected;
-            }}
-            rowTextForSelection={(item, index) => {
-                return item;
-            }}
-        />
-    );
-
+    // if (!manual) {
+    //     arrivingGETAPI(id)
+    //     updateManView = (
+    //         <View style={styles.rowContain}>
+    //             <Text style={styles.text}>Item: </Text>
+    //             <Text style={styles.text}> {item_man} </Text>
+    //         </View>
+    //     );
+    // }
 
     // For dropdown of actions
     const createDropdownAction = (item) => {
         if (arrID.length > 0) {
-            console.log('item is arriving: true')
             return ["Buy", "Sell", "Arrived"]
         } else {
-            console.log('item is arriving: false')
             return ["Buy", "Sell"]
         }
     }
@@ -215,7 +228,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     data={createDropdownAction(item_man)}
                     onSelect={(selectedItem, index) => {
                         setAction(selectedItem)
-                        arrivingGETAPI(id)
+                        // arrivingGETAPI(id)
                     }}
                     defaultButtonText={'Select Action'}
                     buttonTextAfterSelection={(selectedItem, index) => {
@@ -437,7 +450,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 </Text>
             </View>
             <View style={styles.rowContain}>
-                {updateManView}
+                {updateManView()}
             </View>
             <View>
                 {actionsView}

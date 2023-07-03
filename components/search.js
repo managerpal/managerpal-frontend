@@ -15,16 +15,11 @@ const SearchScreen = ( {navigation} ) => {
             if (!response.ok) {
                 throw new Error('Item retrieve failed');
             } else {
-                // const names = data.items.map(item => item.name)
-                // console.log(names)
-                // setItemArray(names);
-                // console.log(itemarray)
                 const names = data.items
                 setItemArray(names)
-                console.log(itemarray)
             }
         } catch (error) {
-            console.log(error);
+            console.log(error + ' error is at searchGet API');
             Alert.alert('Submission failed', error.message);
         }
     };
