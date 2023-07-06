@@ -93,7 +93,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
 
     React.useEffect(() => {
         manualGet();
-        console.log(item_man + ' - name after initialisation - in React.useEffect')
+        console.log(item_man + ' - name after initialisation - in React.useEffect updateItem')
     }, []);
 
     // API call to GET "arriving" information

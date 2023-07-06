@@ -1,13 +1,15 @@
-import React from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, FlatList} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, FlatList } from 'react-native';
 
-const SearchScreen = ( {navigation} ) => {
-    const [itemarray, setItemArray] = React.useState([])
+const SearchScreen = ({ navigation }) => {
+    const [itemArray, setItemArray] = useState([]);
+    const [itemID, setItemID] = React.useState([]);
 
+    // To get all the current items
     const searchGet = async () => {
         const search = {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
         };
         try {
             const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
@@ -15,32 +17,36 @@ const SearchScreen = ( {navigation} ) => {
             if (!response.ok) {
                 throw new Error('Item retrieve failed');
             } else {
-                const names = data.items
-                setItemArray(names)
+                const names = data.items;
+                setItemArray(names);
+                const ids = data.items.map(item => item.id);
+                setItemID(ids);
             }
         } catch (error) {
             console.log(error + ' error is at searchGet API');
             Alert.alert('Submission failed', error.message);
         }
     };
-    React.useEffect(() => {
+
+    useEffect(() => {
         searchGet();
     }, []);
 
-    const Item = ( {title, qty} ) => (
+    const Item = ({ title, qty}) => (
         <View>
             <TouchableOpacity
                 style={styles.card}
-                onPress={() => navigation.navigate('productDetails',
-                    {
+                onPress={() =>
+                    navigation.navigate('productDetails', {
                         item: title,
                         quantity: qty,
-                    }
-                )}
+                        id: itemID[itemArray.indexOf(title)]
+                    })
+                }
             >
                 <View style={styles.infoContainer}>
-                    <Text style={styles.name}> {title} </Text>
-                    <Text style={styles.qty}>Quantity: {qty} </Text>
+                    <Text style={styles.name}>{title}</Text>
+                    <Text style={styles.qty}>Quantity: {qty}</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -49,16 +55,16 @@ const SearchScreen = ( {navigation} ) => {
     return (
         <SafeAreaView>
             <FlatList
-                data={itemarray}
-                renderItem={
-                    ({item}) => <Item title={item.name}
-                                     qty = {item.qty}
+                data={itemArray}
+                renderItem={({ item, index }) => (
+                    <Item title={item.name}
+                          qty={item.qty}
                     />
-                }
+                )}
             />
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     card: {
@@ -72,11 +78,11 @@ const styles = StyleSheet.create({
             width: 0,
         },
         elevation: 1,
-        marginVertical: 10,
-        marginHorizontal: 20
+        marginVertical: 15,
+        marginHorizontal: 20,
     },
     infoContainer: {
-        padding: 16,
+        padding: 18,
     },
     name: {
         fontSize: 22,
@@ -87,13 +93,30 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 8,
         marginLeft: 5,
-        marginTop: 5
+        marginTop: 5,
     },
 });
 
-export default SearchScreen
+export default SearchScreen;
 
 
+// const [arrSum, setArrSum] = useState([]);
+// React.useEffect(() => {
+//     let array = []
+//     let index = 0
+//
+//     itemArray.forEach((item) => {
+//         arrivingGETAPI(item.id);
+//         console.log(index + ' ' + arrQty + ' temp array in useEffect, search page')
+//         let curr
+//         curr = arrQty.reduce((acc, curr) => acc + curr, 0)
+//         array[index] = curr
+//         index++
+//     });
+//
+//     setArrSum(array)
+// }, [itemArray]);
+// console.log(arrSum + ' arrSum in useEffect, search page')
 
 // For testing
 // const itemarray = [

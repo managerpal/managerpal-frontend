@@ -15,9 +15,39 @@ import SelectDropdown from 'react-native-select-dropdown'
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 
 const ProductDetails = ( {route} ) => {
-    const {item, quantity} = route.params
+    const {item, quantity, id} = route.params
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+
+    // To get arriving information for that item
+    const [arrQty, setArrQty] = useState([]);
+    const arrivingGETAPI = async (productId) => {
+        try {
+            const request = {
+                method: 'GET',
+            };
+            let endPoint = 'https://managerpal.seewhyjay.dev/inventory/arriving';
+            if (productId) {
+                endPoint += `?product_id=${productId}`;
+            }
+            const response = await fetch(endPoint, request);
+            const data = await response.json();
+            if (response.status === 200) {
+                const arrQtys = data.items.map((item) => item.qty);
+                setArrQty(arrQtys);
+            } else {
+                console.log('status 400 error is at arrivingGETAPI');
+                Alert.alert('Failure', 'Unable to retrieve arriving information');
+            }
+        } catch (error) {
+            console.log(error + ' error is at arrivingGETAPI');
+            Alert.alert('Failure', error.message);
+        }
+    };
+
+    React.useEffect(() => {
+        arrivingGETAPI(id);
+    }, []);
 
     // LocaleConfig.locales['fr'] = {
     //     monthNames: [
@@ -93,7 +123,8 @@ const ProductDetails = ( {route} ) => {
                 </Text>
             </View>
             <View>
-                <Text style={styles.text}>Quantity: {quantity} </Text>
+                <Text style={styles.text}>Instock Quantity: {quantity} </Text>
+                <Text style={styles.text}>Total Arriving: {arrQty.reduce((acc, curr) => acc + curr, 0)} </Text>
             </View>
             <View style ={{alignItems: 'center'}}>
                 <QRCode value={item}/>
