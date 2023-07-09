@@ -36,10 +36,6 @@ const UpdateScreen = ( {navigation} ) => {
             console.log('searchGet has an error the error is here' + error);
             Alert.alert('Submission failed', error.message);
         }
-        finally {
-            console.log('exit searchGet')
-            return
-        }
     };
 
     React.useEffect(() => {

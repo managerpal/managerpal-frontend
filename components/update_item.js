@@ -7,10 +7,10 @@ const UpdateItemScreen = ( {route, navigation} ) => {
 
     const [id, setID] = React.useState(ID)
     const [item_man, setItem] = React.useState(item)
-    const [qty, setQty] = React.useState(quantity) // for buy quantity
+    const [qty, setQty] = React.useState(quantity) // for sell quantity
 
     const [action, setAction] = React.useState('')
-    const [price, setPrice] = React.useState(0)
+    const [price, setPrice] = React.useState(-1)
     const [date_day, setDate_day] = React.useState(0)
     const [date_month, setDate_month] = React.useState('')
     const [date_year, setDate_year] = React.useState(0)
@@ -57,12 +57,19 @@ const UpdateItemScreen = ( {route, navigation} ) => {
         if (action === 'Arrived') {
             arrivingPOSTAPI()
         } else {
-            submitPost()
+            if (price !== -1 && date_day !== 0 && date_month !== '' && date_year !== 0) {
+                submitPost()
+            } else {
+               Alert.alert(
+                   'Unsuccessful',
+                   'Fields cannot be blank',
+                   [{ text: 'Cancel', onPress: () => {}}]
+               );
+            }
         }
     }
 
     // To generate all the items for the dropdown
-    // need API to return name (item) only
     const [itemarray, setItemArray] = React.useState([])
     const [itemID, setItemID] = React.useState([]);
     const [itemQty, setItemQty] = React.useState([]);
@@ -111,6 +118,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             }
             const response = await fetch(endPoint, request);
             const data = await response.json();
+            console.log(endPoint + ' end point for arriving')
             if (response.status === 200) {
                 const arrIDs = data.items.map(item => item.id);
                 const arrQtys = data.items.map(item => item.qty)
@@ -181,7 +189,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     setItem(selected);
                     setQty(itemQty[index]);
                     setID(itemID[index]);
-                    arrivingGETAPI(id);
+                    arrivingGETAPI(itemID[index]);
                 }}
                 defaultValueByIndex={index}
                 defaultButtonText={'Select Item'}
@@ -194,17 +202,6 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             />
         )
     }
-
-
-    // if (!manual) {
-    //     arrivingGETAPI(id)
-    //     updateManView = (
-    //         <View style={styles.rowContain}>
-    //             <Text style={styles.text}>Item: </Text>
-    //             <Text style={styles.text}> {item_man} </Text>
-    //         </View>
-    //     );
-    // }
 
     // For dropdown of actions
     const createDropdownAction = (item) => {
@@ -228,7 +225,6 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                     data={createDropdownAction(item_man)}
                     onSelect={(selectedItem, index) => {
                         setAction(selectedItem)
-                        // arrivingGETAPI(id)
                     }}
                     defaultButtonText={'Select Action'}
                     buttonTextAfterSelection={(selectedItem, index) => {
