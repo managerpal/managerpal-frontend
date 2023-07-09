@@ -12,7 +12,7 @@ const SearchScreen = ({ navigation }) => {
             headers: { 'Content-Type': 'application/json' },
         };
         try {
-            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list_products', search);
             const data = await response.json();
             if (!response.ok) {
                 throw new Error('Item retrieve failed');

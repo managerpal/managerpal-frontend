@@ -3,7 +3,7 @@ import React from "react";
 import SelectDropdown from 'react-native-select-dropdown'
 import {get} from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-const AlertScreen = () => {
+const AlertScreen = ( {navigation} ) => {
     const [itemarray, setItemArray] = React.useState([])
     const [itemqty, setItemQty] = React.useState([])
     const [itemID, setID] = React.useState([])
@@ -16,14 +16,14 @@ const AlertScreen = () => {
             headers: { 'Content-Type': 'application/json' }
         };
         try {
-            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list_products', search);
             const data = await response.json();
             if (response.status === 400) {
                 throw new Error('Item retrieve failed');
             } else {
                 const names = data.items.map(item => item.name);
                 setItemArray(names);
-                const qty = data.items.map(item => item.qty);
+                const qty = data.items.map(item => item.qty !== null ? item.qty : 0);
                 setItemQty(qty)
                 const id = data.items.map(item => item.id);
                 setID(id)
@@ -35,14 +35,18 @@ const AlertScreen = () => {
     };
 
     React.useEffect(() => {
-        searchGet();
+        searchGet().then(() => {
+            console.log(itemarray + ' full item array in alert page');
+            console.log(itemqty + ' full qty list in alert page');
+        });
     }, []);
 
     const dropdown = [1, 2, 3, 5, 10, 15, 20]
 
     const getFilteredItems = (val) => {
         let tempArray = []
-        for (let i = 0; i < itemarray.length; i++) {
+        console.log(val)
+        for (let i = 0; i <= itemarray.length; i++) {
             if (itemqty[i] <= val) {
                 tempArray.push(itemarray[i])
             }
@@ -73,6 +77,10 @@ const AlertScreen = () => {
 
     return (
         <SafeAreaView>
+            <Text style={styles.info}> Select quantity to filter by</Text>
+            <View>
+                <Text style={styles.moreInfo}> Items shown have instock quantity less than or equal to quantity selected </Text>
+            </View>
             <SelectDropdown
                 buttonStyle={styles.dropdown}
                 buttonTextStyle={styles.dropdownText}
@@ -91,8 +99,8 @@ const AlertScreen = () => {
             <FlatList
                 data={filterArray}
                 renderItem={({ item, index }) => (
-                    <Item title={item[index]}
-                          qty={item.qty}
+                    <Item title={itemarray[index]}
+                          qty={itemqty[index]}
                     />
                 )}
             />
@@ -143,6 +151,21 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         marginTop: 5,
         color: 'red'
+    },
+    info: {
+        fontSize: 18,
+        fontWeight: '300',
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 10,
+    },
+    moreInfo: {
+        fontSize: 14,
+        fontWeight: '200',
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
     },
 })
 

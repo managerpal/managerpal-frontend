@@ -80,7 +80,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
             headers: { 'Content-Type': 'application/json' }
         };
         try {
-            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list_products', search);
             const data = await response.json();
             if (!response.ok) {
                 throw new Error('Item retrieve failed');
@@ -89,8 +89,8 @@ const UpdateItemScreen = ( {route, navigation} ) => {
                 setItemArray(names.concat(''));
                 const ids = data.items.map(item => item.id);
                 setItemID(ids);
-                const quantities = data.items.map(item => item.qty);
-                setItemQty(quantities);
+                const qty = data.items.map(item => item.qty !== null ? item.qty : 0);
+                setItemQty(qty);
             }
         } catch (error) {
             console.log(error + ' error is at manualGet');

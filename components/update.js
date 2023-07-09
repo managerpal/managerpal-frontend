@@ -20,7 +20,7 @@ const UpdateScreen = ( {navigation} ) => {
             headers: { 'Content-Type': 'application/json' }
         };
         try {
-            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list', search);
+            const response = await fetch('https://managerpal.seewhyjay.dev/inventory/list_products', search);
             const data = await response.json();
             if (response.status === 400) {
                 throw new Error('Item retrieve failed');
@@ -29,7 +29,7 @@ const UpdateScreen = ( {navigation} ) => {
                 setItemArray(names);
                 const id = data.items.map(item => item.id);
                 setID(id)
-                const qty = data.items.map(item => item.qty);
+                const qty = data.items.map(item => item.qty !== null ? item.qty : 0);
                 setItemQty(qty)
             }
         } catch (error) {
