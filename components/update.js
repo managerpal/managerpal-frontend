@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import {Text, View, StyleSheet, Button, Alert} from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import UpdateItemScreen from "./update_item";
 
 const UpdateScreen = ( {navigation} ) => {
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [text, setText] = useState('Please scan item QR code');
-    const [item, setItem] = useState('test');
+    const [item, setItem] = useState('');
+    const [ID, setID] = useState(-1);
+    const [qty, setQty] =useState(-1);
 
     // API call to search for item exist (for QR code)
-    const [itemarray, setItemArray] = React.useState([])
-    const [itemID, setID] = React.useState([])
-    const [itemqty, setItemQty] = React.useState([])
+    const [itemArray, setItemArray] = React.useState([])
+    const [itemIDArray, setIDArray] = React.useState([])
+    const [itemQtyArray, setItemQtyArray] = React.useState([])
 
     const searchGet = async () => {
         const search = {
@@ -27,10 +28,10 @@ const UpdateScreen = ( {navigation} ) => {
             } else {
                 const names = data.items.map(item => item.name);
                 setItemArray(names);
-                const id = data.items.map(item => item.id);
-                setID(id)
-                const qty = data.items.map(item => item.qty !== null ? item.qty : 0);
-                setItemQty(qty)
+                const ids = data.items.map(item => item.id);
+                setIDArray(ids)
+                const qtys = data.items.map(item => item.qty !== null ? item.qty : 0);
+                setItemQtyArray(qtys)
             }
         } catch (error) {
             console.log('searchGet has an error the error is here' + error);
@@ -42,8 +43,8 @@ const UpdateScreen = ( {navigation} ) => {
         searchGet();
     }, []);
 
-    const itemExist = async (item) => {
-        return itemarray.includes(item);
+    const itemExist = (item) => {
+        return itemArray.includes(item);
     };
 
     const askForCameraPermission = () => {
@@ -59,34 +60,42 @@ const UpdateScreen = ( {navigation} ) => {
     }, []);
 
     // After scanning
-    const handleBarCodeScanned = ({type, data}) => {
+    const handleBarCodeScanned = async ({type, data}) => {
         const scannedItem = data
         setScanned(true);
         setText('Item scanned')
         setItem(scannedItem)
-        console.log('item scanned is: ' + item + ' in handleBarCodeScanned')
+        console.log('item scanned is ' + data + ' in handleBarCodeScanned, update page')
 
-        if (itemExist(scannedItem)) {
-            const index = itemarray.indexOf(scannedItem)
-            const qty = itemqty[index]
-            const ID = itemID[index]
-            console.log(ID + ' : item ID after barcode scan')
-            console.log(qty + ' : quantity after barcode scan')
-            console.log(item + ' : item name after barcode scan')
+        const exists = itemExist(scannedItem);
+        if (exists) {
+            const index = itemArray.indexOf(scannedItem)
+            setQty(itemQtyArray[index])
+            setID(itemIDArray[index])
+        } else {
+            Alert.alert('Error',
+                data + ' ' + ' ' + item + ' ' + itemExist(item),
+                [{
+                    text: 'Cancel', onPress: () => {
+                    }
+                }]
+            )
+        }
+    };
 
+    React.useEffect(() => {
+        console.log(ID + ' : item ID after barcode scan')
+        console.log(qty + ' : quantity after barcode scan')
+        console.log(item + ' : item name after barcode scan')
+        if (ID !== -1 && qty !== -1 && item !== '') {
             navigation.navigate('UpdateItemScreen', {
                 ID: ID,
                 item: item,
                 quantity: qty,
-                manual: false
-            })
-        } else {
-            Alert.alert('Error',
-                data + ' ' + ' ' + item + ' ' + itemExist(item),
-                [{ text: 'Cancel', onPress: () => {}}]
-                )
+                manual: false,
+            });
         }
-    };
+    }, [item, qty, ID]);
 
     // Check permissions and return the screens
     if (hasPermission === null) {

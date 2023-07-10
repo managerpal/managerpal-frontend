@@ -77,8 +77,8 @@ const AlertScreen = ( {navigation} ) => {
 
     return (
         <SafeAreaView>
-            <Text style={styles.info}> Select quantity to filter by</Text>
             <View>
+                <Text style={styles.info}> Select quantity to filter by</Text>
                 <Text style={styles.moreInfo}> Items shown have instock quantity less than or equal to quantity selected </Text>
             </View>
             <SelectDropdown

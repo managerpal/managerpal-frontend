@@ -30,6 +30,7 @@ const ProductDetails = ( {route} ) => {
             if (productId) {
                 endPoint += `?product_id=${productId}`;
             }
+            // console.log(endPoint + ' productDetails endpoint')
             const response = await fetch(endPoint, request);
             const data = await response.json();
             if (response.status === 200) {
@@ -47,7 +48,8 @@ const ProductDetails = ( {route} ) => {
 
     React.useEffect(() => {
         arrivingGETAPI(id);
-    }, []);
+        // console.log(id + ' item id')
+    }, [item]);
 
     // LocaleConfig.locales['fr'] = {
     //     monthNames: [
@@ -122,12 +124,20 @@ const ProductDetails = ( {route} ) => {
                     {item}
                 </Text>
             </View>
+            <View style={styles.QRCodeBox}>
+                <View>
+                    <Text style={styles.info}> QR Code for: {item}</Text>
+                    <Text style={styles.moreInfo}> Save this QR code and scan it in "Update" page for faster updating </Text>
+                </View>
+                <View style ={{alignItems: 'center'}}>
+                    <QRCode value={item}/>
+                </View>
+            </View>
+            <View style={styles.line} />
             <View>
+                <Text style={styles.smallerTitle}> Product Details </Text>
                 <Text style={styles.text}>Instock Quantity: {quantity} </Text>
                 <Text style={styles.text}>Total Arriving: {arrQty.reduce((acc, curr) => acc + curr, 0)} </Text>
-            </View>
-            <View style ={{alignItems: 'center'}}>
-                <QRCode value={item}/>
             </View>
         </SafeAreaView>
     )
@@ -139,6 +149,13 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: '500',
         textAlignVertical: 'center'
+    },
+    smallerTitle: {
+        textAlign:'left',
+        fontSize: 24,
+        fontWeight: '300',
+        marginBottom: 10,
+        marginLeft: 20
     },
     card: {
         backgroundColor: 'white',
@@ -169,6 +186,32 @@ const styles = StyleSheet.create({
     calendarEnd: {
         marginRight: 20,
         width: Dimensions.get('window').width / 1.5 - 40,
+    },
+    info: {
+        fontSize: 18,
+        fontWeight: '300',
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
+    },
+    moreInfo: {
+        fontSize: 14,
+        fontWeight: '200',
+        marginBottom: 10,
+        marginLeft: 10,
+        marginRight: 10,
+    },
+    QRCodeBox: {
+        backgroundColor: 'white',
+        marginVertical: 10,
+        marginHorizontal: 20,
+        justifyContent: "center",
+        padding: 12
+    },
+    line: {
+        borderBottomColor: 'black',
+        borderBottomWidth: 2,
+        margin: 20
     }
 })
 

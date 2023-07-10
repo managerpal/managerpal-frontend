@@ -4,6 +4,7 @@ import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, FlatList
 const SearchScreen = ({ navigation }) => {
     const [itemArray, setItemArray] = useState([]);
     const [itemID, setItemID] = React.useState([]);
+    const [itemqty, setItemQty] = React.useState([])
 
     // To get all the current items
     const searchGet = async () => {
@@ -17,10 +18,12 @@ const SearchScreen = ({ navigation }) => {
             if (!response.ok) {
                 throw new Error('Item retrieve failed');
             } else {
-                const names = data.items;
+                const names = data.items.map(item => item.name);
                 setItemArray(names);
-                const ids = data.items.map(item => item.id);
-                setItemID(ids);
+                const id = data.items.map(item => item.id);
+                setItemID(id)
+                const qty = data.items.map(item => item.qty !== null ? item.qty : 0);
+                setItemQty(qty)
             }
         } catch (error) {
             console.log(error + ' error is at searchGet API');
@@ -36,12 +39,15 @@ const SearchScreen = ({ navigation }) => {
         <View>
             <TouchableOpacity
                 style={styles.card}
-                onPress={() =>
+                onPress={() => {
                     navigation.navigate('productDetails', {
                         item: title,
                         quantity: qty,
                         id: itemID[itemArray.indexOf(title)]
                     })
+                    // console.log(itemArray + ' product array in search')
+                }
+
                 }
             >
                 <View style={styles.infoContainer}>
@@ -57,8 +63,8 @@ const SearchScreen = ({ navigation }) => {
             <FlatList
                 data={itemArray}
                 renderItem={({ item, index }) => (
-                    <Item title={item.name}
-                          qty={item.qty}
+                    <Item title={itemArray[index]}
+                          qty={itemqty[index]}
                     />
                 )}
             />

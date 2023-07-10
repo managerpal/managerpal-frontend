@@ -14,7 +14,7 @@ const ProfileScreen = ({navigation}) => {
                 fontWeight: '500',
                 marginBottom: 20
             }}>
-                Home
+                Profile
             </Text>
             <Button
                 title={'Logout'}
