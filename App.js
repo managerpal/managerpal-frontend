@@ -23,12 +23,12 @@ function App() {
                   title: 'Sign in',
                 }}
             />
-            <Stack.Screen name="Register" component={RegisterScreen}/>
-            <Stack.Screen name="MainContainer" component={MainContainer} />
-            <Stack.Screen name="Log out" component={LogoutScreen}/>
-            <Stack.Screen name="UpdateItemScreen" component={UpdateItemScreen}/>
-            <Stack.Screen name="productDetails" component={ProductDetails}/>
-            <Stack.Screen name="CreateItemScreen" component={CreateItemScreen}/>
+            <Stack.Screen name="Register" component={RegisterScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="MainContainer" component={MainContainer} options={{headerShown: false}}/>
+            <Stack.Screen name="Log out" component={LogoutScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="UpdateItemScreen" component={UpdateItemScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="productDetails" component={ProductDetails} options={{headerShown: false}}/>
+            <Stack.Screen name="CreateItemScreen" component={CreateItemScreen} options={{headerShown: false}}/>
         </Stack.Navigator>
       </NavigationContainer>
   );

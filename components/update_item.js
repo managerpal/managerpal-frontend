@@ -258,7 +258,7 @@ const UpdateItemScreen = ( {route, navigation} ) => {
     // for dropdown of year, starting from 2000 to 20223
     const createDropdownDateYear = () => {
         let result = []
-        for (let i = 2000; i <= 2023; i++) {
+        for (let i = 2023; i >= 1900; i--) {
             result.push(i);
         }
         return result;

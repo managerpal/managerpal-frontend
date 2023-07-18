@@ -33,7 +33,7 @@ const SearchScreen = ({ navigation }) => {
 
     useEffect(() => {
         searchGet();
-    }, []);
+    }, [itemArray]);
 
     const Item = ({ title, qty}) => (
         <View>

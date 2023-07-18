@@ -38,7 +38,7 @@ function MainContainer() {
                 activeTintColor: '#1300D5',
                 inactiveTintColor: 'grey',
                 labelStyle: { fontSize: 10 },
-                tabStyle: { paddingTop: 10 },
+                tabStyle: { paddingTop: 10, height: 70, paddingBottom: 10 },
                 style: { height: 200}
             }}
         >
