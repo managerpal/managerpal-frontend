@@ -93,7 +93,11 @@ const ProductDetails = ( {route} ) => {
         }
     };
 
-    const [sales, setSales] = useState([]);
+    const [profit, setProfit] = useState(null);
+    const [totalBought, setTotalBought] = useState(null);
+    const [totalExpense, setTotalExpense] = useState(null);
+    const [totalRevenue, setTotalRevenue] = useState(null);
+    const [totalSold, setTotalSold] = useState(null);
     const  salesAPI = async (productId, dates) => {
         let endPoint = 'https://managerpal.seewhyjay.dev/inventory/product_detailed'
         if (productId) {
@@ -109,8 +113,11 @@ const ProductDetails = ( {route} ) => {
             if (response.status === 400) {
                 throw new Error('Sales retrieve failed');
             } else {
-                setSales(data)
-                console.log(data + ' sales data in productDetails')
+                setProfit(data.profit)
+                setTotalBought(data.total_bought)
+                setTotalExpense(data.total_expense)
+                setTotalRevenue(data.total_revenue)
+                setTotalSold(data.total_sold)
                 console.log(endPoint)
             }
         } catch (error) {
@@ -118,6 +125,7 @@ const ProductDetails = ( {route} ) => {
         }
     };
 
+    const [salesObject, setSalesObject] = useState(null);
 
     React.useEffect(() => {
         updatesAPI(id, null, date)
@@ -188,10 +196,48 @@ const ProductDetails = ( {route} ) => {
                     </SafeAreaView>
                 </View>
             )
-        } else if (sel === 'View item Sales') {
+        } else if (sel === 'View product performance') {
             return (
-                <View>
+                <View style={styles.bigBox}>
+                    <Text style={styles.info}>Finance information</Text>
+                    <View style={styles.smallBoxForDate}>
+                        <Text style={ profit < 0? styles.profitFalse : styles.profitTrue}>{profit}</Text>
+                        <Text style={styles.boxText}>Total Profit</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <View style={styles.smallBox}>
+                            <View style={styles.column}>
+                                <Text style={styles.boxValue}>{totalExpense}</Text>
+                                <Text style={styles.boxText}>Total</Text>
+                                <Text style={styles.boxText}>Expense</Text>
+                            </View>
+                        </View>
+                        <View style={styles.smallBox}>
+                            <View style={styles.column}>
+                                <Text style={styles.boxValue}>{totalRevenue}</Text>
+                                <Text style={styles.boxText}>Total</Text>
+                                <Text style={styles.boxText}>Revenue</Text>
+                            </View>
+                        </View>
+                    </View>
 
+                    <Text style={styles.info}>Stock information</Text>
+                    <View style={styles.row}>
+                        <View style={styles.smallBox}>
+                            <View style={styles.column}>
+                                <Text style={styles.boxValue}>{totalBought}</Text>
+                                <Text style={styles.boxText}>Total</Text>
+                                <Text style={styles.boxText}>Bought</Text>
+                            </View>
+                        </View>
+                        <View style={styles.smallBox}>
+                            <View style={styles.column}>
+                                <Text style={styles.boxValue}>{totalSold}</Text>
+                                <Text style={styles.boxText}>Total</Text>
+                                <Text style={styles.boxText}>Sold</Text>
+                            </View>
+                        </View>
+                    </View>
                 </View>
             )
         } else if (sel === '') {
@@ -395,7 +441,7 @@ const ProductDetails = ( {route} ) => {
                     <SelectDropdown
                         buttonStyle={styles.dropdown}
                         buttonTextStyle={styles.dropdownText}
-                        data={['View all Updates', 'View all Sales', '']}
+                        data={['View all Updates', 'View product performance', '']}
                         onSelect={(selected, index) => {
                             setDropdownView(selected)
                         }}
@@ -486,7 +532,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 15,
         width: '40%',
-        aspectRatio: 1.4
+        aspectRatio: 1.3
     },
     row : {
         flexDirection: 'row',
@@ -556,14 +602,31 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 10,
-        width: '99%',
+        marginLeft:20,
+        width: '89%',
     },
     columnForDate: {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'left',
         flex: 1
-    }
+    },
+    profitTrue: {
+        fontSize: 20,
+        fontWeight: '600',
+        marginBottom: 8,
+        marginLeft: 5,
+        marginTop: 8,
+        color: 'green'
+    },
+    profitFalse: {
+        fontSize: 20,
+        fontWeight: '600',
+        marginBottom: 8,
+        marginLeft: 5,
+        marginTop: 5,
+        color: 'red'
+    },
 })
 
 export default ProductDetails

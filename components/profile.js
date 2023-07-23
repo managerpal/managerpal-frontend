@@ -9,8 +9,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { BarChart, LineChart, PieChart } from "react-native-gifted-charts";
 
 const ProfileScreen = ({navigation}) => {
-    const [itemqty, setItemQty] = React.useState([])
     const [alertFilter, setAlertFilter] = React.useState(5)
+
+    const [itemqty, setItemQty] = React.useState([])
+    const [itemArray, setItemArray] = useState([]);
+    const [itemID, setItemID] = React.useState([]);
 
     // To get all the current items
     const searchGet = async () => {
@@ -26,6 +29,10 @@ const ProfileScreen = ({navigation}) => {
             } else {
                 const qty = data.items.map(item => item.qty !== null ? item.qty : 0);
                 setItemQty(qty)
+                const names = data.items.map(item => item.name);
+                setItemArray(names);
+                const id = data.items.map(item => item.id);
+                setItemID(id)
             }
         } catch (error) {
             console.log(error + ' error is at searchGet API');
@@ -56,11 +63,43 @@ const ProfileScreen = ({navigation}) => {
         }
     };
 
+    const [profit, setProfit] = useState(null);
+    const [totalSold, setTotalSold] = useState(null);
+    const  salesAPI = async (productId, dates) => {
+        let endPoint = 'https://managerpal.seewhyjay.dev/inventory/product_detailed'
+        if (productId) {
+            endPoint += `?product_id=${productId}`;
+        }
+        if (dates) {
+            const [startDate, endDate] = dates.split(',');
+            endPoint += `&dates=${startDate},${endDate}`;
+        }
+        try {
+            const response = await fetch(endPoint);
+            const data = await response.json();
+            if (response.status === 400) {
+                throw new Error('Sales retrieve failed');
+            } else {
+                setProfit(data.profit)
+                setTotalSold(data.total_sold)
+                console.log(endPoint)
+            }
+        } catch (error) {
+            console.log('salesAPI has an error ' + error);
+        }
+    };
+
+    const [profitArray, setProfitArray] = useState([]);
+    const [soldArray, setTotalSoldArray] = useState([]);
+
     React.useEffect(() => {
-        arrivingGETAPI().then(console.log(arrQty + ' arrQty in Profile page'))
-        searchGet().then(console.log(itemqty))
-        // console.log(id + ' item id')
+        let tempProfArr = []
+        let tempSoldArr = []
+        arrivingGETAPI()
+        searchGet()
     }, []);
+
+    // const barData = [{value: 15}, {value: 30}, {value: 26}, {value: 40}];
 
     return (
         <SafeAreaView>
@@ -78,23 +117,6 @@ const ProfileScreen = ({navigation}) => {
                             <Text style={styles.boxValue}> {itemqty.filter(val => val <= alertFilter).length} </Text>
                             <Text style={styles.boxText}> Alert </Text>
                         </View>
-                    </View>
-                </View>
-            </View>
-            <View>
-                <View style={styles.bigBox}>
-                    <Text style={styles.info}> Top products </Text>
-                    <View style={styles.medalRow}>
-                        <Ionicons name={'medal'} size={50} color='#E9C534' style={styles.icon}/>
-                        <Text style={styles.boxValue}> Item 1 </Text>
-                    </View>
-                    <View style={styles.medalRow}>
-                        <Ionicons name={'medal'} size={50} color='#B9B6AC' style={styles.icon}/>
-                        <Text style={styles.boxValue}> Item 2 </Text>
-                    </View>
-                    <View style={styles.medalRow}>
-                        <Ionicons name={'medal'} size={50} color='#A58E42' style={styles.icon}/>
-                        <Text style={styles.boxValue}> Item 3 </Text>
                     </View>
                 </View>
             </View>

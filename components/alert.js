@@ -1,7 +1,6 @@
 import {Alert, Button, FlatList, SafeAreaView, Text, TouchableOpacity, View, StyleSheet} from "react-native";
 import React from "react";
 import SelectDropdown from 'react-native-select-dropdown'
-import {get} from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const AlertScreen = ( {navigation} ) => {
     const [itemarray, setItemArray] = React.useState([])
@@ -45,7 +44,6 @@ const AlertScreen = ( {navigation} ) => {
 
     const getFilteredItems = (val) => {
         let tempArray = []
-        console.log(val)
         for (let i = 0; i <= itemarray.length; i++) {
             if (itemqty[i] <= val) {
                 tempArray.push(itemarray[i])
