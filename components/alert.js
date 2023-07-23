@@ -36,7 +36,8 @@ const AlertScreen = ( {navigation} ) => {
     React.useEffect(() => {
         searchGet().then(() => {
             console.log(itemarray + ' full item array in alert page');
-            console.log(itemqty + ' full qty list in alert page');
+            console.log(itemqty + ' full qty list in alert page')
+                .then(() => getFilteredItems(val))
         });
     }, []);
 

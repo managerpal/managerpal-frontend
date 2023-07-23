@@ -5,8 +5,6 @@ import {
     Text,
     View, StyleSheet, Alert, TouchableOpacity,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { BarChart, LineChart, PieChart } from "react-native-gifted-charts";
 
 const ProfileScreen = ({navigation}) => {
     const [alertFilter, setAlertFilter] = React.useState(5)

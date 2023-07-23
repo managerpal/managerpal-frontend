@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg'
 import SelectDropdown from 'react-native-select-dropdown'
-import { BarChart, LineChart, PieChart } from "react-native-gifted-charts";
 
 const ProductDetails = ( {route} ) => {
     const {item, quantity, id} = route.params
